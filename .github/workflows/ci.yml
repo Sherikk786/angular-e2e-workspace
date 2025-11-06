@@ -1,3 +1,36 @@
+# name: Nx CI
+
+# on:
+#   push:
+#     branches: [main]
+
+# jobs:
+#   build-and-test:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 18
+
+#       - name: Install dependencies
+#         run: npm install
+
+#       - name: Lint
+#         run: npx nx lint liveapp
+
+#       - name: Unit Tests
+#         run: npx nx test liveapp
+
+#       - name: E2E Tests
+#         run: npx nx e2e liveapp-e2e
+
+#       - name: Build Angular App
+#         run: npx nx build liveapp
 name: Nx CI
 
 on:
@@ -7,6 +40,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      NX_CLOUD_DISTRIBUTED_EXECUTION: false
 
     steps:
       - name: Checkout code
