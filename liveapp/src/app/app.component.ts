@@ -1,13 +1,36 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcomeComponent } from './nx-welcome.component';
+// import { Component } from '@angular/core';
+// import { RouterModule } from '@angular/router';
+// import { NxWelcomeComponent } from './nx-welcome.component';
+
+// @Component({
+//   imports: [NxWelcomeComponent, RouterModule],
+//   selector: 'app-root',
+//   templateUrl: './app.component.html',
+//   styleUrl: './app.component.css',
+//   standalone:true,
+// })
+// export class AppComponent {
+//   title = 'liveapp';
+// }
+import { Component, OnInit } from '@angular/core';
+import { Apollo, gql } from 'apollo-angular';
 
 @Component({
-  imports: [NxWelcomeComponent, RouterModule],
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  template: `<p>{{ greeting }}</p>`,
 })
-export class AppComponent {
-  title = 'liveapp';
+export class AppComponent implements OnInit {
+  greeting = '';
+
+  constructor(private apollo: Apollo) {}
+
+  ngOnInit() {
+    this.apollo
+      .watchQuery({
+        query: gql`{ hello }`,
+      })
+      .valueChanges.subscribe((result: any) => {
+        this.greeting = result?.data?.hello;
+      });
+  }
 }

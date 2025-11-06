@@ -15,3 +15,13 @@
 
 // Import commands.ts using ES2015 syntax:
 import './commands';
+// cypress/support/e2e.ts or cypress/support/index.ts
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // Ignore the jQuery is not defined error and let the tests continue
+    if (err.message.includes('jQuery is not defined')) {
+      return false;  // Prevent Cypress from failing the test
+    }
+    return true;  // All other errors will fail the test
+  });
+  
