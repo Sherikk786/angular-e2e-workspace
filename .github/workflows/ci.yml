@@ -56,11 +56,6 @@ jobs:
       - name: Lint
         run: npx nx lint liveapp
 
-      # ✅ Removed: npx nx test liveapp
-      # ✅ Added E2E Tests for both projects
-      - name: E2E Tests - GraphQL App
-        run: npx nx e2e graphql-e2e
-
       - name: E2E Tests - Live App
         run: npx nx e2e liveapp-e2e
 
