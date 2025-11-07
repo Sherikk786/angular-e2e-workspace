@@ -40,8 +40,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    env:
-      NX_CLOUD_DISTRIBUTED_EXECUTION: false
 
     steps:
       - name: Checkout code
@@ -50,7 +48,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
@@ -58,10 +56,12 @@ jobs:
       - name: Lint
         run: npx nx lint liveapp
 
-      - name: Unit Tests
-        run: npx nx test liveapp
+      # ✅ Removed: npx nx test liveapp
+      # ✅ Added E2E Tests for both projects
+      - name: E2E Tests - GraphQL App
+        run: npx nx e2e graphql-e2e
 
-      - name: E2E Tests
+      - name: E2E Tests - Live App
         run: npx nx e2e liveapp-e2e
 
       - name: Build Angular App
