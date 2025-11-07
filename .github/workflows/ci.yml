@@ -48,11 +48,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Checkout repository
+      # ✅ Checkout repo
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ✅ Setup Node.js (use Node 20 to fix wait-on issue)
+      # ✅ Setup Node.js 20 (fix wait-on issue)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -63,25 +63,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ✅ Build GraphQL API (required for Angular app)
+      # ✅ Build GraphQL API (production)
       - name: Build GraphQL API
         run: npx nx build graphql-api
 
       # ✅ Start GraphQL API in background
-      - name: Start GraphQL API
+      - name: Start GraphQL API in background
         run: |
-          npx nx serve graphql-api &
+          nohup npx nx serve graphql-api > graphql-api.log 2>&1 &
+          echo "GraphQL API starting..."
           npx wait-on http://localhost:4000
+          echo "✅ GraphQL API is ready!"
 
-      # ✅ Build Angular app
-      - name: Build Angular app
+      # ✅ Build Angular App
+      - name: Build Angular App
         run: npx nx build liveapp
 
-      # ✅ Run only LiveApp E2E Tests
+      # ✅ Run E2E Tests (only liveapp-e2e)
       - name: Run LiveApp E2E Tests
         run: npx nx e2e liveapp-e2e
 
-      # ✅ Upload Cypress screenshots/videos if any failure
+      # ✅ Upload Cypress screenshots/videos if tests fail
       - name: Upload test artifacts
         if: failure()
         uses: actions/upload-artifact@v4
