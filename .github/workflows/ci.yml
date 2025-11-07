@@ -31,38 +31,62 @@
 
 #       - name: Build Angular App
 #         run: npx nx build liveapp
-name: Nx CI/CD Pipeline
+name: NX CI/CD
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - master
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - master
 
 jobs:
-  e2e:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # ✅ Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
+      # ✅ Setup Node.js (use Node 20 to fix wait-on issue)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
+      # ✅ Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # 👇 Start GraphQL API in background
-      - name: Start GraphQL API
-        run: npx nx serve graphql-api &
-      
-      # 👇 Wait for server to be ready at http://localhost:4000/
-      - name: Wait for GraphQL API to start
-        run: npx wait-on http://localhost:4000/
+      # ✅ Build GraphQL API (required for Angular app)
+      - name: Build GraphQL API
+        run: npx nx build graphql-api
 
-      # 👇 Run only LiveApp E2E tests (Cypress or Playwright)
+      # ✅ Start GraphQL API in background
+      - name: Start GraphQL API
+        run: |
+          npx nx serve graphql-api &
+          npx wait-on http://localhost:4000
+
+      # ✅ Build Angular app
+      - name: Build Angular app
+        run: npx nx build liveapp
+
+      # ✅ Run only LiveApp E2E Tests
       - name: Run LiveApp E2E Tests
         run: npx nx e2e liveapp-e2e
+
+      # ✅ Upload Cypress screenshots/videos if any failure
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: |
+            dist/cypress/**/screenshots
+            dist/cypress/**/videos
