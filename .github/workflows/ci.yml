@@ -31,33 +31,38 @@
 
 #       - name: Build Angular App
 #         run: npx nx build liveapp
-name: Nx CI
+name: Nx E2E Tests
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build-and-test:
+  e2e:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Lint
-        run: npx nx lint liveapp
+      # 👇 Start GraphQL API in background
+      - name: Start GraphQL API
+        run: npx nx serve graphql-api &
 
-      - name: E2E Tests - Live App
+      # 👇 Wait until GraphQL server is ready
+      - name: Wait for GraphQL server
+        run: npx wait-on http://localhost:4000/graphql
+
+      # 👇 Run only LiveApp E2E tests
+      - name: Run LiveApp E2E
         run: npx nx e2e liveapp-e2e
-
-      - name: Build Angular App
-        run: npx nx build liveapp
