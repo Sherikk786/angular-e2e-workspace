@@ -20,6 +20,7 @@ import { Apollo, gql } from 'apollo-angular';
   template: `<p>{{ greeting }}</p>`,
 })
 export class AppComponent implements OnInit {
+  title = 'liveapp'; 
   greeting = '';
 
   constructor(private apollo: Apollo) {}
