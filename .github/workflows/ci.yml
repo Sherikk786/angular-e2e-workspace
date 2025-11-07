@@ -31,7 +31,7 @@
 
 #       - name: Build Angular App
 #         run: npx nx build liveapp
-name: Nx E2E Tests
+name: Nx CI/CD Pipeline
 
 on:
   push:
@@ -44,10 +44,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -58,11 +58,11 @@ jobs:
       # 👇 Start GraphQL API in background
       - name: Start GraphQL API
         run: npx nx serve graphql-api &
+      
+      # 👇 Wait for server to be ready at http://localhost:4000/
+      - name: Wait for GraphQL API to start
+        run: npx wait-on http://localhost:4000/
 
-      # 👇 Wait until GraphQL server is ready
-      - name: Wait for GraphQL server
-        run: npx wait-on http://localhost:4000/graphql
-
-      # 👇 Run only LiveApp E2E tests
-      - name: Run LiveApp E2E
+      # 👇 Run only LiveApp E2E tests (Cypress or Playwright)
+      - name: Run LiveApp E2E Tests
         run: npx nx e2e liveapp-e2e
